@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+</head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ALL THINGS SPORTS | Stephan Azevedo</title>
+  <style type="text/css">
+  body{
+    background-color: black;
+  }
+
+
+    .header_wrap {
+      background-image: url("Sports-Personalities-In-India.png"); background-repeat: no-repeat;
+      height: 100%;
+      padding-bottom: 0em;
+      padding-top: 25em;
+      background-repeat: no-repeat;
+      background-position: center top;
+      background-attachment: fixed;
+      margin-top: 40px;
+    }
+
+    .sports_wrapbg {
+      background-image: url("sports.jpg"); background-repeat: repeat-y;"
+    }
+
+
+  </style>
+
+</head>
+
+<body>
+
+    <div class="container">
+    <!-- Heading Pannel -->
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel panel-default header_wrap">
+            <h1 class="text-center">ALL THINGS SPORTS</h1>
+              <div class="panel-body text-center">
+
+                  
+                  
+                  <div id="sportDiv"></div>
+                  <form id="sport-form" class="form-inline">
+                    <div class="form-group">
+                      <label for="sport-input">Add a Sport</label>
+                      <input type="text" id="sport-input"><br>
+                      <input id="add-sport" type="submit" value="Submit" class="btn btn-prime">
+                      
+                    </div>
+                  </form>
+          </div>
+                    <!-- Sports will get dumped here -->
+            </div>
+        </div>
+      </div>
+ <!-- End of Heading Pannel -->
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel panel-default sports_wrapbg">
+          <div class="panel-heading text-center"><h3>Sports</h3></div>
+          <div class="panel-body ">
+
+                        
+
+                      <!-- gif's results from button click -->
+                      <div id="sport-view" style="background-image: url("sports.jpg");" data-state="still">
+                        
+                      </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> 
+
+      <!-- sport button added -->
+      
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript">
+
+
+      // Initial sports array
+
+var topicsArray = ["McGregor", "Miami Heat", "NFL", "Formula One", "Golden State", "WWE", "Hockey", "Golf"];
+
+      // Function for rendering button
+      function renderButtons() {
+        // for deleting the buttons before adding a new one
+        $("#sportDiv").empty();
+        // for loop
+        for (var i=0; i < topicsArray.length; i++) {
+          var a = $("<button>");
+          a.addClass("sport btn btn-warning");
+          a.attr("data-name", topicsArray[i]);
+          a.text(topicsArray[i]);
+          $("#sportDiv").append(a);
+        }
+      }
+
+      renderButtons();
+
+      $(document).on('click', '#add-sport', function(event){
+      event.preventDefault();
+      var sport = $("#sport-input").val().trim();
+      topicsArray.push(sport);
+      $('#sport-input').val('');
+      renderButtons();
+      });
+
+
+
+//event listner
+  $(document).on('click', '.sport', function() {
+    var sport = $(this).html();
+    // Giphy API URL    
+    var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + sport + "&api_key=dc6zaTOxFJmzC&limit=10";
+        //AJAX GET request
+        $.ajax({
+            url: queryURL, 
+            method: 'GET'
+        })
+
+        .done(function(response) {
+            var results = response.data;
+
+            $('#sport-view').empty();
+                for ( var t=0; t < results.length; t++) {
+                    if (results[t].rating !== "r" && results[t].rating !== "pg-13") {
+                    var imageStill = $('<div>');
+
+                    var rating = results[t].rating;
+                        // Create the paragraph tag with result item's rating
+                        var displayRated= $('<p>').text("Rating: " + rating);
+                        $('#sport-view').prepend(displayRated);
+                    
+                    var stillHolder = results[t].images.fixed_height.url;
+                    var still = results[t].images.fixed_height_still.url;
+                    // Creating an image tag
+                    var sportImage = $('<img>').attr("src", still).attr('data-animate', stillHolder).attr('data-still', still);
+                    sportImage.attr('data-state', 'still');
+                    $('#sport-view').prepend(sportImage);
+                    sportImage.on('click', playGif);
+                    
+                        
+            
+                } //for loop
+            }
+        }); // done response
+
+        function playGif() { 
+                    var state = $(this).attr('data-state');
+                 if ( state == 'still'){
+                     $(this).attr('src', $(this).data('animate'));
+                      $(this).attr('data-state', 'animate');
+                 } else{
+                     $(this).attr('src', $(this).data('still'));
+                     $(this).attr('data-state', 'still');
+                    }
+
+                } //click sport
+                
+    }) // doc on click
+
+    </script>
+
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+    
+  </div>
+</body>
+
+</html>
